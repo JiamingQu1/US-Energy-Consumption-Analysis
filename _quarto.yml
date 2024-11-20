@@ -6,12 +6,12 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "US Energy Consumption Analysis"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
-  date: today
+    - Jeremy Qu (jq2406)
+    - Matt Xi (yx2933)
+  repo-url: https://github.com/JiamingQu1/US-Energy-Consumption-Analysis.git
+  date: 11/20/2024
   page-footer:
     right: |
       This book was built with <a href="https://quarto.org/">Quarto</a>.
