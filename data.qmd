@@ -1,5 +1,22 @@
 # Data
+For this research/analysis, we will mainly use the Residential Energy Consumption Survey (RECS) 2020 data produced by the U.S Energy Information Administration (EIA). The 2020 RECS study represents the 15th iteration of the program, which started in 2020 and the last update was completed in Jan 2020. Data was collected from around 18,500 households in housing units statistically selected to represent the 123.5 million housing units that are occupied as primary residences (EIA, 2024). The survey offers data in:
+
+- Detailed information on energy usage patterns in U.S. homes
+- Data on various energy end uses, including air conditioning, space heating, and water heating
+- Breakdowns of electricity consumption by region and housing type
 
 ## Description
+There is a total of 799 features in this dataset, but for the purpose of this analysis, we investigate the relationship between household total electricity use (KWH) with the following features:
 
+1. Climatic Impact:
+    1. HDD65 (Heating degree days in 2020)
+    2. CDD65 (Cooling degree days in 2020)
+2. Geographic Impact:
+    1. state_postal (State and State Postal)
+    2. UATYP10 (2010 Census Urban Type Code)
+    3. TYPEHUQ (Type of housing unit)
+3. Socioeconomic Factors
+    1. MONEYPY (Annual gross household income for the past year)
+    2. ENERGYASST20 (Received energy assistance )
+    
 ## Missing value analysis
