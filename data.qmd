@@ -22,7 +22,7 @@ There is a total of 799 features in this dataset, but for the purpose of this an
 As these data are all unified under the same source, we can analyze from various economic and geographic dimensions without the need to merge many datasets and deal with the different granularity of data. Hence, this study mainly uses the RECS dataset, but may include other data sources later in the project based on necessity.
 
 ## Missing value analysis
-```{r}
+```{r, message = FALSE, warning=FALSE}
 # Setup
 library(tidyverse)
 df <- read.csv('recs2020.csv')
@@ -37,12 +37,12 @@ energy <- df |>
   select(state_postal, KWH, DOLLAREL, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20)
 ```
 
-We first understand that the columns with missing data are not in the set of columns that we need to use. However, we also want to check if the KWH values are 0 (which may indicate missing data).
+We first understand that the columns with missing data are not in the set of columns that we need to use. However, we also want to check if the KWH values are 0 (which may indicate missing data). The check below shows that no KWH values are 0 as well, indicating that there is no potential missing or problematic data within the part of the dataset that we are working with,
 
-```{r}
+```{r, message = FALSE, warning=FALSE}
+
 # Check KWH column if anything equals to 0
 sum(energy$KWH == 0)
-
 library(redav)
 plot_missing(energy, percent = FALSE)
 ```
