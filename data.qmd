@@ -30,7 +30,7 @@ df <- read.csv('recs2020.csv')
 # We want to understand which columns have the most na's
 # This also helps us know if the columns we are using are affected
 na_counts <- colSums(is.na(df)) |> sort(decreasing = TRUE)  
-head(na_counts, 15)
+# head(na_counts, 15)
 
 # Select only the columns we are interested in
 energy <- df |>
