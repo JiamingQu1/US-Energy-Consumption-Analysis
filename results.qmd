@@ -49,6 +49,13 @@ write.csv(energy, "recs2020cleaned.csv")
 
 energy <- read.csv('recs2020cleaned.csv')
 summary(energy)
+
+average_KWH_state <- energy |> 
+  group_by(state_name) |> 
+  summarise(avg_KWH = mean(KWH, na.rm = TRUE))
+library(jsonlite)
+json_data <- toJSON(average_KWH_state, pretty = TRUE)
+write(json_data, "output.json")
 ```
 
 ## Mapping by geolocation
@@ -161,6 +168,7 @@ print(combined_plot)
 
 ```{r type of weather, ridgeplot}
 library(forcats)  # For fct_reorder
+library(ggridges)
 
 custom_colors <- c("Subarctic" = 'purple',
                    "Very-Cold" = 'cornflowerblue',
