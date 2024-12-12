@@ -1,0 +1,206 @@
+[
+  {
+    "state_name": "Alabama",
+    "avg_KWH": 14120.3732
+  },
+  {
+    "state_name": "Alaska",
+    "avg_KWH": 7644.9581
+  },
+  {
+    "state_name": "Arizona",
+    "avg_KWH": 13883.8728
+  },
+  {
+    "state_name": "Arkansas",
+    "avg_KWH": 13741.3625
+  },
+  {
+    "state_name": "California",
+    "avg_KWH": 6775.266
+  },
+  {
+    "state_name": "Colorado",
+    "avg_KWH": 8492.7584
+  },
+  {
+    "state_name": "Connecticut",
+    "avg_KWH": 8473.1145
+  },
+  {
+    "state_name": "Delaware",
+    "avg_KWH": 11210.0951
+  },
+  {
+    "state_name": "District of Columbia",
+    "avg_KWH": 7420.0962
+  },
+  {
+    "state_name": "Florida",
+    "avg_KWH": 14460.2715
+  },
+  {
+    "state_name": "Georgia",
+    "avg_KWH": 13473.74
+  },
+  {
+    "state_name": "Hawaii",
+    "avg_KWH": 8365.4729
+  },
+  {
+    "state_name": "Idaho",
+    "avg_KWH": 11226.4088
+  },
+  {
+    "state_name": "Illinois",
+    "avg_KWH": 8937.2274
+  },
+  {
+    "state_name": "Indiana",
+    "avg_KWH": 12035.9775
+  },
+  {
+    "state_name": "Iowa",
+    "avg_KWH": 10604.6619
+  },
+  {
+    "state_name": "Kansas",
+    "avg_KWH": 11178.7576
+  },
+  {
+    "state_name": "Kentucky",
+    "avg_KWH": 13472.0475
+  },
+  {
+    "state_name": "Louisiana",
+    "avg_KWH": 15103.9938
+  },
+  {
+    "state_name": "Maine",
+    "avg_KWH": 7395.7467
+  },
+  {
+    "state_name": "Maryland",
+    "avg_KWH": 12218.4401
+  },
+  {
+    "state_name": "Massachusetts",
+    "avg_KWH": 7867.8804
+  },
+  {
+    "state_name": "Michigan",
+    "avg_KWH": 8459.1037
+  },
+  {
+    "state_name": "Minnesota",
+    "avg_KWH": 9773.9378
+  },
+  {
+    "state_name": "Mississippi",
+    "avg_KWH": 14511.1407
+  },
+  {
+    "state_name": "Missouri",
+    "avg_KWH": 12279.4937
+  },
+  {
+    "state_name": "Montana",
+    "avg_KWH": 9631.9174
+  },
+  {
+    "state_name": "Nebraska",
+    "avg_KWH": 11362.0987
+  },
+  {
+    "state_name": "Nevada",
+    "avg_KWH": 11469.9962
+  },
+  {
+    "state_name": "New Hampshire",
+    "avg_KWH": 7625.6425
+  },
+  {
+    "state_name": "New Jersey",
+    "avg_KWH": 8989.2253
+  },
+  {
+    "state_name": "New Mexico",
+    "avg_KWH": 8366.5472
+  },
+  {
+    "state_name": "New York",
+    "avg_KWH": 7574.9458
+  },
+  {
+    "state_name": "North Carolina",
+    "avg_KWH": 12638.6646
+  },
+  {
+    "state_name": "North Dakota",
+    "avg_KWH": 12531.562
+  },
+  {
+    "state_name": "Ohio",
+    "avg_KWH": 10576.741
+  },
+  {
+    "state_name": "Oklahoma",
+    "avg_KWH": 13890.6404
+  },
+  {
+    "state_name": "Oregon",
+    "avg_KWH": 11339.7333
+  },
+  {
+    "state_name": "Pennsylvania",
+    "avg_KWH": 10620.5683
+  },
+  {
+    "state_name": "Rhode Island",
+    "avg_KWH": 7449.0531
+  },
+  {
+    "state_name": "South Carolina",
+    "avg_KWH": 13567.796
+  },
+  {
+    "state_name": "South Dakota",
+    "avg_KWH": 11227.5381
+  },
+  {
+    "state_name": "Tennessee",
+    "avg_KWH": 14765.1898
+  },
+  {
+    "state_name": "Texas",
+    "avg_KWH": 13990.4809
+  },
+  {
+    "state_name": "Utah",
+    "avg_KWH": 9415.0257
+  },
+  {
+    "state_name": "Vermont",
+    "avg_KWH": 6899.4094
+  },
+  {
+    "state_name": "Virginia",
+    "avg_KWH": 13109.4375
+  },
+  {
+    "state_name": "Washington",
+    "avg_KWH": 11270.9689
+  },
+  {
+    "state_name": "West Virginia",
+    "avg_KWH": 13822.8353
+  },
+  {
+    "state_name": "Wisconsin",
+    "avg_KWH": 8673.9805
+  },
+  {
+    "state_name": "Wyoming",
+    "avg_KWH": 9441.0933
+  }
+]

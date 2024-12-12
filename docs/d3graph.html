@@ -169,16 +169,151 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<style>
-  * {
-    font-family: sans-serif;
-  }
-</style>
-<div id="plot">
 
-</div>
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="scripts/myscript.js"></script>
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Barplot</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        #controls {
+            margin-bottom: 20px;
+        }
+        .dropdown {
+            margin-right: 10px;
+        }
+        svg {
+            font: 12px sans-serif;
+        }
+        .bar {
+            opacity: 0.8;
+        }
+        .bar:hover {
+            opacity: 1;
+        }
+    </style>
+
+
+    <h2 class="anchored">Choose 2 states and compare the annual average electricity usage per household</h2>
+    <div id="controls">
+        <label for="state1">Select State 1:</label>
+        <select id="state1" class="dropdown"></select>
+
+        <label for="state2">Select State 2:</label>
+        <select id="state2" class="dropdown"></select>
+    </div>
+    <div id="plot"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script>
+        // Load data
+        d3.json("output.json").then(data => {
+            // Create dropdowns
+            const states = data.map(d => d.state_name);
+            const dropdown1 = d3.select("#state1");
+            const dropdown2 = d3.select("#state2");
+
+            dropdown1.selectAll("option")
+                .data(states)
+                .enter()
+                .append("option")
+                .text(d => d)
+                .attr("value", d => d);
+
+            dropdown2.selectAll("option")
+                .data(states)
+                .enter()
+                .append("option")
+                .text(d => d)
+                .attr("value", d => d);
+
+            // Initial states
+            dropdown1.property("value", states[0]);
+            dropdown2.property("value", states[1]);
+
+            // Create the barplot
+            const svgWidth = 600;
+            const svgHeight = 400;
+            const margin = { top: 50, right: 20, bottom: 50, left: 50 };
+            const width = svgWidth - margin.left - margin.right;
+            const height = svgHeight - margin.top - margin.bottom;
+
+            const svg = d3.select("#plot")
+                .append("svg")
+                .attr("width", svgWidth)
+                .attr("height", svgHeight);
+
+            const plotGroup = svg.append("g")
+                .attr("transform", `translate(${margin.left}, ${margin.top})`);
+
+            const xScale = d3.scaleBand()
+                .range([0, width])
+                .padding(0.4);
+
+            const yScale = d3.scaleLinear()
+                .range([height, 0]);
+
+            const xAxisGroup = plotGroup.append("g")
+                .attr("transform", `translate(0, ${height})`);
+
+            const yAxisGroup = plotGroup.append("g");
+
+            // Function to update barplot
+            function updateBarplot(state1, state2) {
+                const filteredData = data.filter(d => d.state_name === state1 || d.state_name === state2);
+
+                xScale.domain(filteredData.map(d => d.state_name));
+                yScale.domain([0, d3.max(filteredData, d => d.avg_KWH)]);
+
+                const bars = plotGroup.selectAll(".bar")
+                    .data(filteredData, d => d.state_name);
+
+                bars.enter()
+                    .append("rect")
+                    .attr("class", "bar")
+                    .attr("x", d => xScale(d.state_name))
+                    .attr("y", d => yScale(d.avg_KWH))
+                    .attr("width", xScale.bandwidth())
+                    .attr("height", d => height - yScale(d.avg_KWH))
+                    .attr("fill", (d, i) => i === 0 ? "red" : "blue") // Red for first bar, Blue for second
+                    .merge(bars)
+                    .transition()
+                    .duration(500)
+                    .attr("x", d => xScale(d.state_name))
+                    .attr("y", d => yScale(d.avg_KWH))
+                    .attr("width", xScale.bandwidth())
+                    .attr("height", d => height - yScale(d.avg_KWH))
+                    .attr("fill", (d, i) => i === 0 ? "red" : "blue");
+
+                bars.exit().remove();
+
+                xAxisGroup.transition().duration(500).call(d3.axisBottom(xScale));
+                yAxisGroup.transition().duration(500).call(d3.axisLeft(yScale));
+            }
+
+            // Initial plot
+            updateBarplot(states[0], states[1]);
+
+            // Dropdown event listeners
+            dropdown1.on("change", () => {
+                const state1 = dropdown1.property("value");
+                const state2 = dropdown2.property("value");
+                updateBarplot(state1, state2);
+            });
+
+            dropdown2.on("change", () => {
+                const state1 = dropdown1.property("value");
+                const state2 = dropdown2.property("value");
+                updateBarplot(state1, state2);
+            });
+        });
+    </script>
+
+
 
 
 
