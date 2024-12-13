@@ -185,6 +185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#description" id="toc-description" class="nav-link active" data-scroll-target="#description"><span class="header-section-number">2.1</span> Description</a></li>
   <li><a href="#missing-value-analysis" id="toc-missing-value-analysis" class="nav-link" data-scroll-target="#missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</a></li>
+  <li><a href="#annex-a" id="toc-annex-a" class="nav-link" data-scroll-target="#annex-a"><span class="header-section-number">2.3</span> Annex A</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/JiamingQu1/US-Energy-Consumption-Analysis.git/edit/main/data.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/JiamingQu1/US-Energy-Consumption-Analysis.git/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -224,6 +225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li>HDD65 (Heating degree days in 2020)</li>
 <li>CDD65 (Cooling degree days in 2020)</li>
+<li>BA_climate (Building America Climate Zone)</li>
 </ol></li>
 <li>Geographic Impact:
 <ol type="1">
@@ -234,10 +236,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Socioeconomic Factors
 <ol type="1">
 <li>MONEYPY (Annual gross household income for the past year)</li>
-<li>ENERGYASST20 (Received energy assistance )</li>
+<li>ENERGYASST20 (Received energy assistance)</li>
+</ol></li>
+<li>Habitual factors
+<ol type="1">
+<li>COOLCNTL (Summer temperature control method)</li>
+<li>LGTINLED (Portion of inside light bulbs that are LED)</li>
 </ol></li>
 </ol>
-<p>As these data are all unified under the same source, we can analyze from various economic and geographic dimensions without the need to merge many datasets and deal with the different granularity of data. Hence, this study mainly uses the RECS dataset, but may include other data sources later in the project based on necessity.</p>
+<p>As these data are all unified under the same source, we can analyze from various economic and geographic dimensions without the need to merge many datasets and deal with the different granularity of data.</p>
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
@@ -255,7 +262,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Select only the columns we are interested in</span></span>
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>energy <span class="ot">&lt;-</span> df <span class="sc">|&gt;</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state_postal, KWH, DOLLAREL, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(state_name, state_postal, KWH, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20, BA_climate, COOLCNTL, HEATCNTL, LGTINLED)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>We first understand that the columns with missing data are not in the set of columns that we need to use. However, we also want to check if the KWH values are 0 (which may indicate missing data). The check below shows that no KWH values are 0 as well, indicating that there is no potential missing or problematic data within the part of the dataset that we are working with,</p>
@@ -281,7 +288,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>This check suggests that the section of the dataset we are using for this project is complete and we do not need to work with missing data.</p>
+<p>This check suggests that the section of the dataset we are using for this project is complete and we do not need to work with missing data. However, closer inspection of the specific columns suggests numerical values that represent missing values. These are in general cleaned and usually do not have a high proportion within the dataset. Hence, we will remove these na values when necessary during the latter parts of the analysis.</p>
+</section>
+<section id="annex-a" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="annex-a"><span class="header-section-number">2.3</span> Annex A</h2>
+<p>This section can be used to refer to self-defined values for various features in the results section.</p>
+<p>COOLCNTL 1: (Set and leave it) Set one temperature and leave it there most of the time 2: (Manual) Manually adjust the temperature 3: (Autoset) Programmable or smart thermostat automatically adjusts the temperature 4: (Manual) Turn equipment on or off as needed 5: (No control) Our household does not have control over the temperature</p>
+<p>MONEYPY (Income band) Based on the average household income in the selected states, we simplify the categories to the below: Below 35,000 set to low (categories 1-9) From 35,000-100,000 set to mid (categories 10-14) Higher than 100,000 set to upper (categories 14-16)</p>
+<p>KWH (Energy usage) Set &lt;25% to 0-9300 kwh, Set 25-50% to 9300-13400, Set 50-75% to 13400-18400, Set &gt;75% to above 18400</p>
+<p>COOLCNTL (Cooling ) 1: Set one temperature and leave it there most of the time (Set and leave) 2: Manually adjust the temperature (Manual) 3: Programmable or smart thermostat automatically adjusts the temperature (Autoset) 4: Turn equipment on or off as needed (Manual) 5: No control (no control) Category 2 and 4 incurs lower energy usage and are recommended.</p>
 
 
 </section>

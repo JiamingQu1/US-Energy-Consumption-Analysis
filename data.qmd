@@ -83,5 +83,5 @@ COOLCNTL (Cooling )
 3: Programmable or smart thermostat automatically adjusts the temperature (Autoset)
 4: Turn equipment on or off as needed (Manual)
 5: No control (no control)
-Category 2 and 4 incurs lower energy usage and are recommended
+Category 2 and 4 incurs lower energy usage and are recommended.
 

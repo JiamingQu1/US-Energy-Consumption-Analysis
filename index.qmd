@@ -4,10 +4,12 @@ Understanding household electricity usage is a critical aspect of advancing ener
 
 The analysis aims to explore the factors influencing household electricity usage and costs, providing a comprehensive understanding of how geographic, climatic, housing, and socioeconomic variables interact with energy consumption. Specifically, we will examine:
 
-Geographic and Climatic Impact: Analyze how urbanization levels (UATYP10), heating degree days (HDD65), and cooling degree days (CDD65) affect electricity usage and costs, highlighting regional variations and the influence of climate on energy demands.
+Geographic and Climatic Impact: Analyze climate (BA_Climate), heating degree days (HDD65), and cooling degree days (CDD65) affect electricity usage and costs, highlighting regional variations and the influence of climate on energy demands.
 
-Housing Characteristics: Investigate the role of housing types (TYPEHUQ) in shaping energy consumption patterns, considering structural factors such as insulation and appliance use.
+Housing Characteristics: Investigate the role of housing types (TYPEHUQ) and urbanization levels (UATYP10) in shaping energy consumption patterns, considering structural factors such as insulation and appliance use.
 
-Socioeconomic Factors: Assess the relationship between household income (MONEYPY) and electricity usage (KWH), as well as the mitigating effect of energy assistance programs (ENERGYASST20) on energy costs (DOLLAREL).
+Socioeconomic Factors: Assess the relationship between household income (MONEYPY) and electricity usage (KWH).
 
-Energy Burden and Efficiency: Evaluate the total electricity use (KWH) and costs (DOLLAREL) to identify disparities in energy burden and opportunities for promoting energy efficiency.
+Energy Burden and Efficiency: Evaluate the total electricity use (KWH) to identify disparities in energy burden and opportunities for promoting energy efficiency.
+
+Through these analysis, we aim to suggest policies targeting specific regions and demographics to increase energy savings.
