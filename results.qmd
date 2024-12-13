@@ -249,9 +249,9 @@ We also would want to understand how groups from various annual household income
 ggplot(filtered_data, aes(x = MONEYPY, y = KWH)) +
   geom_jitter(alpha = 0.05, width = 0.5, height = 500) + 
   geom_smooth(method = "lm", formula = y ~ poly(x, 5)) +
-  labs(title = "Regression Analysis: MONEYPY vs KWH (Jitter Applied, Outliers Removed)",
-       x = "Money Spent (MONEYPY)",
-       y = "Energy Consumption (KWH)") +
+  labs(title = "Annual Electricity Usage per Household vs Income Band",
+       x = "Income band (MONEYPY)",
+       y = "Energy Usage (KWH)") +
   theme_minimal()+
   theme(aspect.ratio = 0.5)
 
