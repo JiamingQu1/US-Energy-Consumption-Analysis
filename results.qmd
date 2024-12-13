@@ -6,49 +6,22 @@ library(tidyverse)
 library(dplyr)
 ```
 
-## EDA 
-10 plots:
+## Introduction to results
 
-Include Alluviam and PCA
+The goal of this study is to understand the factors contributing to higher household usage. Based on these factors, we can suggest effective policies, targetting households with specific socio-economic, geographical and habitual characteristics to reduce electrical usage. Before the results, we would like to highlight that instead of analyzing different types of factors (socio-economic, geographical, etc.), we tend to analyze these different categories together to provide more nuanced analysis and suggestions.
 
+Reducing household electricity usage in the United States is crucial for several environmental, economic, and social reasons. The residential sector is a significant contributor to electricity demand, accounting for approximately 37% of total electricity consumption in 2021. By reducing household electricity usage, we can decrease carbon dioxide emissions, mitigate climate change, and lessen the strain on natural resources.
 
-If we want to focus on NY, there are 904 rows altogether
+Please refer to Annex A for detailed documentation on categorization of variables:
 
-1. Climate:
-- (DONE) Geolocation: electricity consumption by the location
-- Scatterplot and geomsmooth of HDD65 and CDD65 (need to find some other indicators)
-  - what can we suggest?
-- (DONE) ridgeline (could change into boxplot) plot of electrical consumption by type of habitat.
-
-2. Socio-economic:
-- (DONE) Electricity usage vs income bracket, color by whether energy assistance (red color, try to set a different alpha to make it more obvious)
-  - Focus on a specific states (if no clear argument, focus on NY).
-- Relationship between electricity consumption and price of electricity.
-
-3. What kind of households should we be targetting?
-- Barplot of electricity usage and type of housing
-- (DONE) Electricity usage vs income bracket (facet by type of housing)
-- barplot of states facet by housing category (which state should focus on which housing category).
-
-LGTINLED: Portion of inside light bulbs that are LED
-SMARTMETER: Whether there is a smartmeter
-ATHOME:
-COOLCNTL: Cooling method of control.
-HEATCNTL: Heating method of control.
-TYPETHERM
-
-Find: average cost of electricity
-Reference:
-
-```{r intialization}
-df <- read.csv('recs2020.csv')
-energy <- df |>
-  select(state_name, state_postal, KWH, DOLLAREL, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20, BA_climate, DIVISION, YEARMADERANGE, KOWNRENT, COOLCNTL, HEATCNTL, LGTINLED, SMARTMETER, TYPETHERM, ATHOME)
-
-write.csv(energy, "recs2020cleaned.csv")
+```{r intialization, warning=FALSE}
+# df <- read.csv('recs2020.csv')
+# energy <- df |>
+#   select(state_name, state_postal, KWH, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20, BA_climate, COOLCNTL, HEATCNTL, LGTINLED)
+# 
+# write.csv(energy, "recs2020cleaned.csv")
 
 energy <- read.csv('recs2020cleaned.csv')
-summary(energy)
 
 average_KWH_state <- energy |> 
   group_by(state_name) |> 
@@ -59,7 +32,7 @@ write(json_data, "output.json")
 ```
 
 ## Mapping by geolocation
-```{r}
+```{r, warning=FALSE}
 library(maps)
 
 # Example dataset: Replace 'data' with your actual dataset
@@ -70,10 +43,7 @@ state_consumption <- energy |>
             avg_cost = mean(DOLLAREL),
             avg_hdd65 = mean(HDD65),
             avg_cdd65 = mean(CDD65))
-```
 
-
-```{r}
 # Load US map data
 us_map <- map_data("state")
 
@@ -104,18 +74,8 @@ ggplot(map_data, aes(x = long, y = lat, group = group, fill = avg_consumption)) 
     axis.ticks = element_blank(),
     panel.grid = element_blank()
   )
-
-
 ```
-First instinct is: South seems to use energy more than the North. 
-
-Question: Why does new England and California spend less electricity? Is it because of better weather?
-
-We noticed that the colder areas are in general spending less electricity in general than the hotter areas. While some New England homes do use electric heating, the majority of heating in New England primarily relies on other sources like natural gas, heating oil, and propane, with natural gas being the most common option in densely populated areas; meaning that electricity is not the primary source of heating in New England, but is still used to some extent, particularly with the increasing adoption of electric heat pumps. So this may cause the colder areas to use less electricity in general.
-
-Energy saving are more urgent on the south than on the north.
-
-Other usage of electricity
+First from a macro perspective, we observe the map average annual energy consumption per household by state. We can evidently observe that the northern part of USA generally consumer less energy than the southern part of USA.
 
 ```{r}
 library(patchwork) # For arranging plots
@@ -158,18 +118,23 @@ cdd65_plot <- ggplot(map_data, aes(x = long, y = lat, group = group, fill = avg_
 
 # Combine the two plots side by side
 combined_plot <- hdd65_plot + cdd65_plot + 
-  plot_layout(ncol = 2)
+  plot_layout(ncol = 1)
 
 # Display the combined plot
 print(combined_plot)
 
 ```
+So does climate potentially impact electrical usage? 
 
+Intuitively, colder areas (which has significantly more average heating degree days, eg Vermont, Maine, Massachusetts) require electricity for heating, whereas hotter areas (which has significantly more average cooling degree days, eg Florida, Texas, Louisiana) require electricity for cooling.
 
-```{r type of weather, ridgeplot}
+Comparing the two maps, we noticed that the colder areas are in general spending less electricity in general than the hotter areas. Through further research, this is because majority of heating in the colder regions primarily rely on sources like natural gas, heating oil, and propane, with natural gas being the most common option in densely populated areas; meaning that electricity is not the primary source of heating in colder areas. This may cause the colder areas to use less electricity in general. On the other hand, AC relies mainly on electricity, therefore explaining the higher usage of electricity in hotter regions (areas with high cooling degree days).
+
+Note: Average Cooling Days indicates the average amount of cooling required in a year or season, similar definition for Average Heating Days.
+
+```{r type of weather, ridgeplot, warning=FALSE}
 library(forcats)  # For fct_reorder
 library(ggridges)
-
 custom_colors <- c("Subarctic" = 'purple',
                    "Very-Cold" = 'cornflowerblue',
                    "Cold" = 'skyblue',
@@ -196,79 +161,43 @@ ggplot(energy, aes(
   scale_x_continuous(limits = c(0, 35000)) +  # Limit x-axis
   scale_fill_manual(values = custom_colors) +  # Custom fill colors
   labs(
-    title = "Ridge Plot of KWH by BA_climate with Mean Annotations",
-    x = "KWH",
-    y = "BA_climate",
+    title = "Ridge Plot of Energy Usage by climate",
+    x = "Energy Usage (KWH)",
+    y = "Climate",
     fill = "Environment type"
   ) +
   theme_minimal()
 ```
+Apart from temperature, the climate of the area also supplements the argument that the South consumes more electricty, where the humid areas consumes more energy than any other type of areas. Areas with hot-humid include areas like Florida, Texas and Lousiana. Based on this piece of analysis, energy policies would make bigger electrical savings in the south than on the north.
 
 
-Further suggest that main contributor is the use of airconditioning (or in general, for cooling). 
-- Add some research for this.
-
-
-Wanna see if the composition in different areas are the same.
 ```{r}
-# Filter data for selected states
-# selected_states <- c("NJ")
-# 
-# filtered_data <- energy |>
-#   filter(state_postal %in% selected_states) |>
-#   count(BA_climate) |>  # Count occurrences of each BA_climate category
-#   mutate(percentage = n / sum(n) * 100)  # Calculate percentage composition
-# 
-# # Bar plot of BA_climate composition
-# ggplot(filtered_data, aes(x = reorder(BA_climate, -percentage), y = percentage, fill = BA_climate)) +
-#   geom_bar(stat = "identity") +
-#   coord_flip() +
-#   scale_fill_brewer(palette = "Set3") +
-#   labs(
-#     title = "Composition of BA_climate in Selected States",
-#     subtitle = "New York, Connecticut, Massachusetts, New Jersey",
-#     x = "BA_climate Category",
-#     y = "Percentage (%)"
-#   ) +
-#   theme_minimal() +
-#   theme(legend.position = "none")
+# Sort state_consumption by avg_consumption in descending order
+state_consumption <- state_consumption |>
+  arrange(desc(avg_consumption))
+
+# View the sorted data
+head(state_consumption)
+
 ```
 
-## Urban environment:
+Based on this, we would like to focus on 3 of the states that has high annual electricity usage per capita and similar contexts (Louisiana, Mississipi and Florida; 1st, 3rd and 4th highest average electricity usage, and all near Gulf of Mexico) for more in-depth analysis on geographic, socio-economic and household characteristics. After filtering to these 3 states, there are still almost 2000 observations, supporting sufficient evidence for different types of analysis.
+
+## Zooming into Louisiana, Mississippi, Florida
+
 ```{r}
-# Ridge plot
-ggplot(energy, aes(x = KWH, y = as.factor(UATYP10), fill = as.factor(UATYP10))) +
-  geom_density_ridges(alpha = 0.7, scale = 1) +  # Ridge plot
-  scale_fill_manual(values = c("C" = "skyblue", "U" = "lightgreen", "R" = "orange"),
-                    labels = c("Urban Cluster", "Rural", "Urban"))+
-  scale_x_continuous(limits = c(0, 50000)) +
-  labs(
-    title = "Ridge Plot of KWH by UATYP10",
-    x = "KWH",
-    y = "Urban Type Code (UATYP10)",
-    fill = "Urban Type",
-  ) +
-  theme_minimal()
+#Filtering data
+selected_states <- c('LA', 'FL', 'MS')
+
+filtered_data <- energy |>
+  filter(state_postal %in% selected_states)
 ```
 
-What are the kind of housing that is causing higher usage
-```{r}
-ggplot(energy, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(size = 0.2, alpha = 0.2, width=0.5) +
-  labs(
-    title = "Scatterplot Faceted by TYPEHUQ",
-    x = "MONEYPY",
-    y = "KWH"
-  ) +
-  facet_wrap(~ as.factor(TYPEHUQ)) + 
-  theme_minimal()
-```
+## Housing typology:
+In the next section, we first analyze the urban characteristics that may also contribute to higher electricity usage.
 
-Category 2, which is single-family house detached from any other house.
-
-
-```{r}
-energy <- energy |>
+```{r, warning=FALSE}
+filtered_data <- filtered_data |>
   mutate(TYPEHUQ = case_when(
     TYPEHUQ == 1 ~ "Mobile",
     TYPEHUQ == 2 ~ "House detached",
@@ -281,8 +210,8 @@ energy <- energy |>
     KOWNRENT == 2 ~ "Rent",
     KOWNRENT == 3 ~ "Occupy wo rent"))
 
-ggplot(energy, aes(x = as.factor(TYPEHUQ), y = KWH, fill = as.factor(TYPEHUQ))) +
-  geom_violin(trim = FALSE, alpha = 0.7) +  # Violin plot with full tails
+ggplot(filtered_data, aes(x = as.factor(TYPEHUQ), y = KWH, fill = as.factor(TYPEHUQ))) +
+  geom_violin(trim = FALSE, alpha = 0.7) +  
   scale_fill_brewer(palette = "Set3") +  
   scale_y_continuous(limits = c(0, 50000)) +
   labs(
@@ -294,271 +223,213 @@ ggplot(energy, aes(x = as.factor(TYPEHUQ), y = KWH, fill = as.factor(TYPEHUQ))) 
   theme_minimal() +
   theme(legend.position = "none")
 ```
-Percentage of a place/type of housing with poor heating or cooling practices.
 
-1 Set one temperature and leave it there most of the time
-2 Manually adjust the temperature 
-3 Programmable or smart thermostat automatically adjusts the temperature 
-4 Turn equipment on or off as needed
-Category 2 and 4 incurs lower energy usage. These are manual practices, which suggests that we should encourage active usage, This is particularly true in xxx states.
-```{r}
-# Filter the data to remove unwanted COOLCNTL values
-filtered_energy <- energy %>%
-  filter(COOLCNTL != 99, COOLCNTL != -2)
-
-# Create a faceted boxplot
-ggplot(filtered_energy, aes(x = as.factor(COOLCNTL), y = KWH, fill = as.factor(COOLCNTL))) +
-  geom_boxplot(alpha = 0.7, outlier.shape = NA) +  # Boxplot without outliers
-  scale_fill_brewer(palette = "Set3") +  
-  scale_y_continuous(limits = c(0, 50000)) +
+```{r, warning=FALSE}
+# Ridge plot
+ggplot(filtered_data, aes(x = KWH, y = as.factor(UATYP10), fill = as.factor(UATYP10))) +
+  geom_density_ridges(alpha = 0.7, scale = 1) +  # Ridge plot
+  scale_fill_manual(values = c("C" = "skyblue", "U" = "lightgreen", "R" = "orange"),
+                    labels = c("Urban Cluster", "Rural", "Urban"))+
+  scale_x_continuous(limits = c(0, 50000)) +
   labs(
-    title = "Energy Usage by Cooling Control",
-    x = "Cooling Control",
-    y = "Energy Usage (KWH)",
-    fill = "Cooling Control"
-  ) +
-  facet_wrap(~DIVISION) +  # Facet by DIVISION
-  theme_minimal() +
-  theme(legend.position = "none")
-```
-
-```{r}
-ggplot(energy, aes(x = as.factor(COOLCNTL), y = KWH, fill = as.factor(COOLCNTL))) +
-  geom_boxplot(alpha = 0.7, outlier.shape = NA) +  # Boxplot without outliers
-  scale_fill_brewer(palette = "Set3") +  
-  scale_y_continuous(limits = c(0, 50000)) +
-  labs(
-    title = "Energy Usage by Cooling Habits",
-    x = "check yourself",
-    y = "Energy Usage (KWH)",
-    fill = "Housing Year"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none")
-
-ggplot(energy, aes(x = as.factor(HEATCNTL), y = KWH, fill = as.factor(HEATCNTL))) +
-  geom_boxplot(alpha = 0.7, outlier.shape = NA) +  # Boxplot without outliers
-  scale_fill_brewer(palette = "Set3") +  
-  scale_y_continuous(limits = c(0, 50000)) +
-  labs(
-    title = "Energy Usage by Heating Habits",
-    x = "check yourself",
-    y = "Energy Usage (KWH)",
-    fill = "Housing Year"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none")
-```
-```{r}
-ggplot(energy, aes(x = as.factor(KOWNRENT), y = KWH, fill = as.factor(KOWNRENT))) +
-  geom_boxplot(alpha = 0.7, outlier.shape = NA) +  # Boxplot without outliers
-  scale_fill_brewer(palette = "Set3") +  
-  scale_y_continuous(limits = c(0, 50000)) +
-  labs(
-    title = "Energy Usage by Housing Type",
-    x = "Housing Type",
-    y = "Energy Usage (KWH)",
-    fill = "Housing Year"
-  ) +
-  theme_minimal() +
-  theme(legend.position = "none")
-```
-
-LED 灯, aircon habit
-LGTINLED: Portion of inside light bulbs that are LED
-SMARTMETER: Whether there is a smartmeter
-ATHOME:
-COOLCNTL: Cooling method of control.
-HEATCNTL: Heating method of control.
-TYPETHERM: 
-
-```{r aircon}
-
-# Categorize and summarize data
-grouped_data <- energy %>%
-  filter(COOLCNTL %in% c(1, 2, 3, 4)) %>%  # Retain only categories 1, 2, 3, and 4
-  mutate(category_group = case_when(
-    COOLCNTL %in% c(1, 3) ~ "Group 1 & 3",
-    COOLCNTL %in% c(2, 4) ~ "Group 2 & 4"
-  )) %>%
-  group_by(state_postal, category_group) %>%
-  summarize(mean_kwh = mean(KWH, na.rm = TRUE), .groups = "drop")
-
-# Perform statistical tests
-test_results <- energy %>%
-  filter(COOLCNTL %in% c(1, 2, 3, 4)) %>%
-  mutate(category_group = case_when(
-    COOLCNTL %in% c(1, 3) ~ "Group 1 & 3",
-    COOLCNTL %in% c(2, 4) ~ "Group 2 & 4"
-  )) %>%
-  group_by(state_postal) %>%
-  summarize(
-    p_value = t.test(
-      KWH[category_group == "Group 1 & 3"],
-      KWH[category_group == "Group 2 & 4"],
-      var.equal = TRUE
-    )$p.value,
-    .groups = "drop"
-  )
-
-# Merge test results for visualization
-visualization_data <- grouped_data %>%
-  left_join(test_results, by = "state_postal")
-
-library(tidyr)  # For pivot_wider
-library(dplyr)
-library(ggplot2)
-
-# Pivot visualization_data to wider format and calculate net difference
-difference_data <- visualization_data %>%
-  pivot_wider(
-    names_from = category_group,
-    values_from = mean_kwh
-  ) %>%
-  mutate(net_difference = `Group 1 & 3` - `Group 2 & 4`) %>%
-  arrange(desc(abs(net_difference)))  # Sort by absolute difference for clarity
-
-# Cleveland dot plot
-ggplot(difference_data, aes(x = net_difference, y = reorder(state_postal, net_difference))) +
-  geom_point(aes(color = net_difference > 0), size = 1) +
-  scale_color_manual(
-    values = c("TRUE" = "steelblue", "FALSE" = "firebrick"),
-    labels = c("Group 2 & 4 Higher", "Group 1 & 3 Higher")
-  ) +
-  labs(
-    title = "Net Difference in Energy Usage Between Groups 1 & 3 vs. Groups 2 & 4",
-    x = "Net Difference (KWH)",
-    y = "State",
-    color = "Higher Group"
+    title = "Ridge Plot of KWH by UATYP10",
+    x = "Energy Usage (KWH)",
+    y = "Urban Type Code (UATYP10)",
+    fill = "Urban Type",
   ) +
   theme_minimal()
-
-
 ```
+We first observe that people living in houses tend to use more electricity than apartments. In a more broad sense , people living in urban areas use more electricity than those in surburban (urban cluster) and rural areas (ridgeplot). Our observations suggest that policies should focus more on investigating electricity usage in single-family detached housing, as a higher proportion of households living in houses use more electricity. While this is understandable (since there are more areas that require additional electricity usage), it also means that effective policies regulating electricity use in such housing typologies could potentially have a more significant impact.
 
 
+## Socio-economic:
+We also would want to understand how groups from various annual household income bands use electricity, ie whether richer households use significantly more energy. 
 
-## Socioeconomic
-```{r}
-data <- df |>
-  select(state_postal, KWH, DOLLAREL, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20)
-
-data <- subset(data, KWH <= 50000)
-ggplot(data, aes(x = MONEYPY, y = KWH)) +
+```{r new}
+ggplot(filtered_data, aes(x = MONEYPY, y = KWH)) +
   geom_jitter(alpha = 0.01, width = 0.5, height = 500) + 
-  labs(title = "Relationship between MONEYPY and KWH (Jitter Applied, Outliers Removed)",
+  geom_smooth(method = "lm", formula = y ~ poly(x, 5)) +
+  labs(title = "Regression Analysis: MONEYPY vs KWH (Jitter Applied, Outliers Removed)",
        x = "Money Spent (MONEYPY)",
        y = "Energy Consumption (KWH)") +
-  theme_minimal()
+  theme_minimal()+
+  theme(aspect.ratio = 0.5)
 
-data$color_group <- ifelse(data$ENERGYASST20 == 1, "With Energy Assistance", "Without Energy Assistance")
+```
+We notice that in general, people with higher household income on average do tend to spend more energy. That said, it is important to observe the nuance within this, that there are much more variability within each classified income band. To further narrow down the specific demographic, we can observe the electricity used by various income bands used for different types of housing.
 
-ggplot(data, aes(x = MONEYPY, y = KWH, color = color_group)) +
-  geom_jitter(alpha = 0.1, width = 0.5, height = 500) + 
-  geom_smooth(data = subset(data, ENERGYASST20 == 1), aes(x = MONEYPY, y = KWH), 
-              method = "lm", formula = y ~ poly(x, 10), se = TRUE, color = "red", linetype = "solid") +
-  geom_smooth(data = subset(data, ENERGYASST20 != 1), aes(x = MONEYPY, y = KWH), 
-              method = "lm", formula = y ~ poly(x, 10), se = TRUE, color = "black", linetype = "dashed") + 
-  scale_color_manual(values = c("With Energy Assistance" = "red", "Without Energy Assistance" = "grey")) +
-  labs(title = "Regression Analysis: MONEYPY vs KWH (Jitter Applied, Separate Lines)",
-       x = "Money Spent (MONEYPY)",
-       y = "Energy Consumption (KWH)",
-       color = "Energy Assistance") +
+```{r, warning=FALSE}
+# Calculate slopes for each TYPEHUQ group
+slopes <- filtered_data |>
+  group_by(TYPEHUQ) |>
+  summarize(slope = lm(KWH ~ MONEYPY)$coefficients[2], .groups = "drop")
+
+# Add labels to the plot with slopes
+ggplot(filtered_data, aes(x = MONEYPY, y = KWH)) +
+  geom_jitter(size = 0.2, alpha = 0.2, width = 0.5) +  # Scatterplot with jitter
+  geom_smooth(method = "lm", color = "blue", se = FALSE, size = 0.7) +  # Best-fit line
+  facet_wrap(~ as.factor(TYPEHUQ)) +  # Facet by TYPEHUQ
+  geom_text(data = slopes, aes(
+    x = Inf, y = Inf, label = sprintf("Slope: %.2f", slope)
+  ), hjust = 1.2, vjust = 1.2, inherit.aes = FALSE, color = "red", size = 3) +  # Add slope labels
+  labs(
+    title = "Electricity Usage vs Income Faceted by Type of Housing",
+    x = "Income bracket",
+    y = "Electrity Usage (KWH)"
+  ) +
   theme_minimal()
 ```
+We observe that single-family detached home tend to use more energy, especially as the income increases. This helps us suggest that it is especially helpful to target richer families living in single-family detached homes.
+
+## Household Habits
+While we could conveniently argue that regions with more unfavorable hot weather (higher temperature) inevitably need to spend more electricity for air-conditional usage, we also found out that many states in the northern part also do have better energy saving havits that may have contributed to the less energy usage.
+
+For example, California has some of the strictest energy efficiency standards in the country, including Title 24, which regulates building energy use. Massachusetts has topped the American Council for an Energy-Efficient Economy (ACEEE) State Energy Efficiency Scorecard for several years. The state offers comprehensive incentives for upgrading to energy-efficient appliances and weatherproofing homes.
+
+As such, we would want to investigate if there are poor habits leading to higher electricity usage. Specifically, we obtained data for the usage of LED lights in households and cooling control method (for eg., how people use AC). Understanding the inadequacies to these habits could help to inform potential policies to reduce energy usage in these places.
 
 
-``` {r}
-filtered_data <- data %>%
-  filter(MONEYPY <= 10) 
+```{r alluviam}
+library(ggalluvial)
 
-avg_kwh_filtered <- filtered_data %>%
-  group_by(MONEYPY, ENERGYASST20) %>%
-  summarise(mean_kwh = mean(KWH, na.rm = TRUE)) %>%
-  mutate(ENERGYASST20 = ifelse(ENERGYASST20 == 1, "With Assistance", "Without Assistance"))
+filtered_data <- filtered_data |>
+  mutate(MONEYPY_cat = case_when(
+    MONEYPY >= 1 & MONEYPY <= 9 ~ "low",
+    MONEYPY >= 10 & MONEYPY <= 14 ~ "mid",
+    MONEYPY >= 15 & MONEYPY <= 16 ~ "high",
+    TRUE ~ NA_character_  
+  )) |>
+  mutate(LGTINLED = case_when(
+    LGTINLED == 1 ~ 4,
+    LGTINLED == 2 ~ 3,
+    LGTINLED == 3 ~ 2,
+    LGTINLED == 4 ~ 1,
+    LGTINLED == 0 ~ 0,
+    TRUE ~ NA_real_  
+  )) |>
+  mutate(KWH_cat = case_when(
+    KWH >= 0 & KWH <= 9300 ~ "<25%",
+    KWH > 9300 & KWH <= 13400 ~ "25-50%",
+    KWH > 13400 & KWH <= 18400 ~ "50-75%",
+    KWH > 18400 ~ ">75%",
+    TRUE ~ NA_character_  
+  )) |>
+  mutate(COOLCNTL_cat = case_when(
+    COOLCNTL == 1 ~ "set and leave",
+    COOLCNTL == 2 ~ "manual",
+    COOLCNTL == 3 ~ "autoset",
+    COOLCNTL == 4 ~ "manual",
+    COOLCNTL == 5 ~ "no control",
+    TRUE ~ NA_character_
+  ))
 
-ggplot(avg_kwh_filtered, aes(x = ENERGYASST20, y = mean_kwh, fill = ENERGYASST20)) +
-  geom_bar(stat = "identity", width = 0.6) +
-  scale_fill_manual(values = c("With Assistance" = "red", "Without Assistance" = "yellow")) +
-  facet_wrap(~ MONEYPY, scales = "free_x", ncol = 2) + 
-  labs(title = "Average Energy Consumption Faceted by MONEYPY (MONEYPY < 10)",
-       x = "Energy Assistance Status",
-       y = "Average Energy Consumption (KWH)",
-       fill = "Assistance Status") +
+allu_data <- filtered_data |>
+  mutate(MONEYPY_cat = factor(MONEYPY_cat, levels = c("high", "mid", "low"))) |>
+  mutate(COOLCNTL_cat = factor(COOLCNTL_cat, levels = c('set and leave', 'autoset','manual','no control'))) |>
+  mutate(LGTINLED = factor(LGTINLED, levels = c('4', '3','2','1', '0'))) |>
+  select(MONEYPY_cat, TYPEHUQ, COOLCNTL_cat, LGTINLED) |>
+  drop_na()  
+
+# Create the alluvial plot
+ggplot(allu_data, aes(axis1 = MONEYPY_cat, axis2 = COOLCNTL_cat, axis3 = TYPEHUQ)) +
+  geom_alluvium(aes(fill = MONEYPY_cat), width = 1/12) +
+  geom_stratum(width = 1/8, fill = "gray") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("Income", 'Cooling control method', "Type of housing"), expand = c(0.1, 0.1)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Alluvial Plot: Income, Housing type and cooling",
+    x = "Variables",
+    y = "Frequency",
+    fill = "Income"
+  ) +
+  theme_minimal()
+```
+In general, we observe that there is still a significant proportion of people in every in every income category and every type of housing that use poor cooling control methods that lead to higher electricity usage. The fact that there is no significant pattern in a particular group using good or poor cooling control methods suggest that policies should focus on the type of housing in general (as mentioned in the previous part), as opposed to a more nuanced group.
+
+```{r}
+# Create the alluvial plot
+ggplot(allu_data, aes(axis1 = MONEYPY_cat, axis2 = LGTINLED, axis3 = TYPEHUQ)) +
+  geom_alluvium(aes(fill = MONEYPY_cat), width = 1/12) +
+  geom_stratum(width = 1/8, fill = "gray") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum))) +
+  scale_x_discrete(limits = c("Income", 'LED', "Type of housing"), expand = c(0.1, 0.1)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Alluvial Plot: Income, LED and housing type",
+    x = "Variables",
+    y = "Frequency",
+    fill = "Income"
+  ) +
+  theme_minimal()
+```
+From this alluvial plot, we observe that the mid and high income groups tend to have more LED light proportions at home. This underlines a potential inaccessibility among the poorer population to LED lights. LED lights are at least twice the price of normal light bulbs, but save more than 80% of electricity. This suggests for policies to enable wider usage of LED lights at least among the lower income population.
+
+
+```{r}
+selected_states <- c('LA', 'FL', 'MS', 'CA')
+
+# Filter the data for selected states
+filtered_data <- energy |>
+  filter(state_postal %in% selected_states)
+
+aggregated_data <- filtered_data |>
+  group_by(state_name, LGTINLED) |>
+  summarise(avg_KWH = mean(KWH, na.rm = TRUE)) |>
+  ungroup()
+
+ggplot(aggregated_data, aes(x = factor(LGTINLED), y = avg_KWH, fill = LGTINLED)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~state_name, scales = "fixed") +
+  scale_fill_gradient(
+    low = "grey",   
+    high = "darkseagreen",
+    name = "Level of LED Usage"
+  ) +
+  labs(
+    title = "Comparison of Average KWH by LGTINLED Across States",
+    x = "LED",
+    y = "Energy Usage (KWH)"
+  ) +
   theme_minimal() +
-  theme(aspect.ratio = 0.3)
+  theme(
+    strip.text = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "bottom"
+  )
+
+# Calculate proportions and percentages
+aggregated_data <- filtered_data |>
+  group_by(state_name, LGTINLED) |>
+  summarise(count_KWH = n(), .groups = "drop") |>
+  group_by(state_name) |>
+  mutate(
+    proportion = count_KWH / sum(count_KWH),
+    percentage = round(proportion * 100, 1) 
+  )
+
+# Create a pie chart for each state using facets
+ggplot(aggregated_data, aes(x = "", y = proportion, fill = factor(LGTINLED))) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  facet_wrap(~state_name) +
+  geom_text(aes(label = paste0(percentage, "%")), 
+            position = position_stack(vjust = 0.5), size = 3) +
+  scale_fill_brewer(palette = "Greens", name = "Level of LED Usage") +
+  labs(
+    title = "Proportion of LED Usage Levels Across States",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_void() +
+  theme(
+    strip.text = element_text(size = 12, face = "bold"),
+    legend.position = "bottom"
+  )
 ```
 
-```{r}
-ggplot(energy, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(size = 0.2, alpha = 0.2, width=0.5) +
-  labs(
-    title = "Scatterplot Faceted by Energy Assistance",
-    x = "MONEYPY",
-    y = "KWH"
-  ) +
-  facet_wrap(~ as.factor(ENERGYASST20)) + # Facet by energy assistance
-  theme_minimal()
+In the final plots, we want to compare a positive case study (California) and usage patterns with the selected states that have very high household electrical usage. This plot highlights regional differences in energy consumption and the potential role of lighting technologies. California’s low consumption and flat trend reinforce its position as a leader in energy efficiency. 
 
-ggplot(energy, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(size = 0.2, alpha = 0.2, width=0.5) +
-  labs(
-    title = "Scatterplot Faceted by TYPEHUQ",
-    x = "MONEYPY",
-    y = "KWH"
-  ) +
-  facet_wrap(~ as.factor(TYPEHUQ)) + # Facet by energy assistance
-  theme_minimal()
-
-ggplot(energy, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(size = 0.2, alpha = 0.2, width=0.5) +
-  labs(
-    title = "Scatterplot Faceted by BA_climate",
-    x = "MONEYPY",
-    y = "KWH"
-  ) +
-  facet_wrap(~ as.factor(BA_climate)) + 
-  theme_minimal()
-```
-
-```{r}
-ggplot(energy, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(size = 0.2, alpha = 0.2, width=0.5) +
-  labs(
-    title = "Scatterplot Faceted by Energy Assistance",
-    x = "MONEYPY",
-    y = "KWH"
-  ) +
-  facet_wrap(~ as.factor(ENERGYASST20)) + # Facet by energy assistance
-  theme_minimal()
-
-ggplot(energy, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(size = 0.2, alpha = 0.2, width=0.5) +
-  labs(
-    title = "Scatterplot Faceted by TYPEHUQ",
-    x = "MONEYPY",
-    y = "KWH"
-  ) +
-  facet_wrap(~ as.factor(TYPEHUQ)) + # Facet by energy assistance
-  theme_minimal()
-
-ggplot(energy, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(size = 0.2, alpha = 0.2, width=0.5) +
-  labs(
-    title = "Scatterplot Faceted by BA_climate",
-    x = "MONEYPY",
-    y = "KWH"
-  ) +
-  facet_wrap(~ as.factor(BA_climate)) + # Facet by energy assistance
-  theme_minimal()
-```
-
-Type 2 housing matters more: uses significantly more, and as income increases, energy consumption increases
-
-
-
-
-
-
+Looking deeper into this, California is recognized as a leader in energy efficiency, largely due to its stringent energy efficiency standards, including Title 24 of the California Code of Regulations, which governs building energy use. The primary goal of Title 24 is to reduce wasteful and unnecessary energy consumption in residential and nonresidential buildings. It mandates energy-efficient design in areas such as insulation, windows, lighting, HVAC systems, and building envelopes. For instance, newer updates have included requirements for the adoption of advanced LED lighting, solar panel integration for new homes, and high-efficiency cooling systems to reduce electricity demand during peak periods. The effect can be observed in the plot above, highlighting that California's policies can be used as a positive case study for the southern states to increase energy efficiency and reduce household electrical usage.
 
 
