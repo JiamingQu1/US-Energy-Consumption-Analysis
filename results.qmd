@@ -247,7 +247,7 @@ We also would want to understand how groups from various annual household income
 
 ```{r new}
 ggplot(filtered_data, aes(x = MONEYPY, y = KWH)) +
-  geom_jitter(alpha = 0.01, width = 0.5, height = 500) + 
+  geom_jitter(alpha = 0.05, width = 0.5, height = 500) + 
   geom_smooth(method = "lm", formula = y ~ poly(x, 5)) +
   labs(title = "Regression Analysis: MONEYPY vs KWH (Jitter Applied, Outliers Removed)",
        x = "Money Spent (MONEYPY)",
@@ -289,7 +289,7 @@ For example, California has some of the strictest energy efficiency standards in
 As such, we would want to investigate if there are poor habits leading to higher electricity usage. Specifically, we obtained data for the usage of LED lights in households and cooling control method (for eg., how people use AC). Understanding the inadequacies to these habits could help to inform potential policies to reduce energy usage in these places.
 
 
-```{r alluviam}
+```{r alluvial}
 library(ggalluvial)
 
 filtered_data <- filtered_data |>
