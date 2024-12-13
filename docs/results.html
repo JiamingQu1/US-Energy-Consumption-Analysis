@@ -542,7 +542,7 @@ Attaching package: 'maps'</code></pre>
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(filtered_data, <span class="fu">aes</span>(<span class="at">x =</span> MONEYPY, <span class="at">y =</span> KWH)) <span class="sc">+</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="fl">0.01</span>, <span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">height =</span> <span class="dv">500</span>) <span class="sc">+</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_jitter</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>, <span class="at">width =</span> <span class="fl">0.5</span>, <span class="at">height =</span> <span class="dv">500</span>) <span class="sc">+</span> </span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">formula =</span> y <span class="sc">~</span> <span class="fu">poly</span>(x, <span class="dv">5</span>)) <span class="sc">+</span></span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Regression Analysis: MONEYPY vs KWH (Jitter Applied, Outliers Removed)"</span>,</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Money Spent (MONEYPY)"</span>,</span>
@@ -661,7 +661,7 @@ Attaching package: 'maps'</code></pre>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="results_files/figure-html/alluviam-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="results_files/figure-html/alluvial-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
