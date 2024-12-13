@@ -11,15 +11,19 @@ There is a total of 799 features in this dataset, but for the purpose of this an
 1. Climatic Impact:
     1. HDD65 (Heating degree days in 2020)
     2. CDD65 (Cooling degree days in 2020)
+    3. BA_climate (Building America Climate Zone)
 2. Geographic Impact:
     1. state_postal (State and State Postal)
     2. UATYP10 (2010 Census Urban Type Code)
     3. TYPEHUQ (Type of housing unit)
 3. Socioeconomic Factors
     1. MONEYPY (Annual gross household income for the past year)
-    2. ENERGYASST20 (Received energy assistance )
-  
-As these data are all unified under the same source, we can analyze from various economic and geographic dimensions without the need to merge many datasets and deal with the different granularity of data. Hence, this study mainly uses the RECS dataset, but may include other data sources later in the project based on necessity.
+    2. ENERGYASST20 (Received energy assistance)
+4. Habitual factors
+    1. COOLCNTL (Summer temperature control method)
+    2. LGTINLED (Portion of inside light bulbs that are LED)
+    
+As these data are all unified under the same source, we can analyze from various economic and geographic dimensions without the need to merge many datasets and deal with the different granularity of data. 
 
 ## Missing value analysis
 ```{r, message = FALSE, warning=FALSE}
@@ -34,7 +38,7 @@ na_counts <- colSums(is.na(df)) |> sort(decreasing = TRUE)
 
 # Select only the columns we are interested in
 energy <- df |>
-  select(state_postal, KWH, DOLLAREL, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20)
+  select(state_name, state_postal, KWH, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20, BA_climate, COOLCNTL, HEATCNTL, LGTINLED)
 ```
 
 We first understand that the columns with missing data are not in the set of columns that we need to use. However, we also want to check if the KWH values are 0 (which may indicate missing data). The check below shows that no KWH values are 0 as well, indicating that there is no potential missing or problematic data within the part of the dataset that we are working with,
@@ -46,5 +50,38 @@ sum(energy$KWH == 0)
 library(redav)
 plot_missing(energy, percent = FALSE)
 ```
-This check suggests that the section of the dataset we are using for this project is complete and we do not need to work with missing data.
+
+This check suggests that the section of the dataset we are using for this project is complete and we do not need to work with missing data. However, closer inspection of the specific columns suggests numerical values that represent missing values. These are in general cleaned and usually do not have a high proportion within the dataset. Hence, we will remove these na values when necessary during the latter parts of the analysis.
+
+
+## Annex A
+This section can be used to refer to self-defined values for various features in the results section.
+
+COOLCNTL
+1: (Set and leave it) Set one temperature and leave it there most of the time
+2: (Manual) Manually adjust the temperature 
+3: (Autoset) Programmable or smart thermostat automatically adjusts the temperature 
+4: (Manual) Turn equipment on or off as needed
+5: (No control) Our household does not have control over the temperature
+
+MONEYPY (Income band)
+Based on the average household income in the selected states, we simplify the categories to the below:
+Below 35,000 set to low (categories 1-9)
+From 35,000-100,000 set to mid (categories 10-14)
+Higher than 100,000 set to upper (categories 14-16)
+
+
+KWH (Energy usage) 
+Set <25% to 0-9300 kwh, 
+Set 25-50% to 9300-13400, 
+Set 50-75% to 13400-18400, 
+Set >75% to above 18400
+
+COOLCNTL (Cooling )
+1: Set one temperature and leave it there most of the time (Set and leave)
+2: Manually adjust the temperature (Manual)
+3: Programmable or smart thermostat automatically adjusts the temperature (Autoset)
+4: Turn equipment on or off as needed (Manual)
+5: No control (no control)
+Category 2 and 4 incurs lower energy usage and are recommended
 

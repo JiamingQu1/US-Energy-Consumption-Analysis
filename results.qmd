@@ -14,10 +14,10 @@ Reducing household electricity usage in the United States is crucial for several
 
 Please refer to Annex A for detailed documentation on categorization of variables:
 
-```{r intialization}
+```{r intialization, warning=FALSE}
 # df <- read.csv('recs2020.csv')
 # energy <- df |>
-#   select(state_name, state_postal, KWH, DOLLAREL, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20, BA_climate, DIVISION, YEARMADERANGE, KOWNRENT, COOLCNTL, HEATCNTL, LGTINLED, SMARTMETER, TYPETHERM, ATHOME)
+#   select(state_name, state_postal, KWH, HDD65, CDD65, UATYP10, TYPEHUQ, MONEYPY, ENERGYASST20, BA_climate, COOLCNTL, HEATCNTL, LGTINLED)
 # 
 # write.csv(energy, "recs2020cleaned.csv")
 
@@ -32,7 +32,7 @@ write(json_data, "output.json")
 ```
 
 ## Mapping by geolocation
-```{r}
+```{r, warning=FALSE}
 library(maps)
 
 # Example dataset: Replace 'data' with your actual dataset
@@ -132,7 +132,7 @@ Comparing the two maps, we noticed that the colder areas are in general spending
 
 Note: Average Cooling Days indicates the average amount of cooling required in a year or season, similar definition for Average Heating Days.
 
-```{r type of weather, ridgeplot}
+```{r type of weather, ridgeplot, warning=FALSE}
 library(forcats)  # For fct_reorder
 library(ggridges)
 custom_colors <- c("Subarctic" = 'purple',
@@ -173,7 +173,7 @@ Apart from temperature, the climate of the area also supplements the argument th
 
 ```{r}
 # Sort state_consumption by avg_consumption in descending order
-state_consumption <- state_consumption %>%
+state_consumption <- state_consumption |>
   arrange(desc(avg_consumption))
 
 # View the sorted data
@@ -196,7 +196,7 @@ filtered_data <- energy |>
 ## Housing typology:
 In the next section, we first analyze the urban characteristics that may also contribute to higher electricity usage.
 
-```{r}
+```{r, warning=FALSE}
 filtered_data <- filtered_data |>
   mutate(TYPEHUQ = case_when(
     TYPEHUQ == 1 ~ "Mobile",
@@ -224,7 +224,7 @@ ggplot(filtered_data, aes(x = as.factor(TYPEHUQ), y = KWH, fill = as.factor(TYPE
   theme(legend.position = "none")
 ```
 
-```{r}
+```{r, warning=FALSE}
 # Ridge plot
 ggplot(filtered_data, aes(x = KWH, y = as.factor(UATYP10), fill = as.factor(UATYP10))) +
   geom_density_ridges(alpha = 0.7, scale = 1) +  # Ridge plot
@@ -258,10 +258,10 @@ ggplot(filtered_data, aes(x = MONEYPY, y = KWH)) +
 ```
 We notice that in general, people with higher household income on average do tend to spend more energy. That said, it is important to observe the nuance within this, that there are much more variability within each classified income band. To further narrow down the specific demographic, we can observe the electricity used by various income bands used for different types of housing.
 
-```{r}
+```{r, warning=FALSE}
 # Calculate slopes for each TYPEHUQ group
-slopes <- filtered_data %>%
-  group_by(TYPEHUQ) %>%
+slopes <- filtered_data |>
+  group_by(TYPEHUQ) |>
   summarize(slope = lm(KWH ~ MONEYPY)$coefficients[2], .groups = "drop")
 
 # Add labels to the plot with slopes
@@ -292,7 +292,7 @@ As such, we would want to investigate if there are poor habits leading to higher
 ```{r alluviam}
 library(ggalluvial)
 
-filtered_data <- filtered_data %>%
+filtered_data <- filtered_data |>
   mutate(MONEYPY_cat = case_when(
     MONEYPY >= 1 & MONEYPY <= 9 ~ "low",
     MONEYPY >= 10 & MONEYPY <= 14 ~ "mid",
@@ -323,11 +323,11 @@ filtered_data <- filtered_data %>%
     TRUE ~ NA_character_
   ))
 
-allu_data <- filtered_data %>%
-  mutate(MONEYPY_cat = factor(MONEYPY_cat, levels = c("high", "mid", "low"))) %>%
+allu_data <- filtered_data |>
+  mutate(MONEYPY_cat = factor(MONEYPY_cat, levels = c("high", "mid", "low"))) |>
   mutate(COOLCNTL_cat = factor(COOLCNTL_cat, levels = c('set and leave', 'autoset','manual','no control'))) |>
   mutate(LGTINLED = factor(LGTINLED, levels = c('4', '3','2','1', '0'))) |>
-  select(MONEYPY_cat, TYPEHUQ, COOLCNTL_cat, LGTINLED) %>%
+  select(MONEYPY_cat, TYPEHUQ, COOLCNTL_cat, LGTINLED) |>
   drop_na()  
 
 # Create the alluvial plot
@@ -340,13 +340,13 @@ ggplot(allu_data, aes(axis1 = MONEYPY_cat, axis2 = COOLCNTL_cat, axis3 = TYPEHUQ
   labs(
     title = "Alluvial Plot: Income, Housing type and cooling",
     x = "Variables",
-    y = "Frequency"
+    y = "Frequency",
+    fill = "Income"
   ) +
   theme_minimal()
 ```
-We observe that there is still a significant proportion of people in every 
+In general, we observe that there is still a significant proportion of people in every in every income category and every type of housing that use poor cooling control methods that lead to higher electricity usage. The fact that there is no significant pattern in a particular group using good or poor cooling control methods suggest that policies should focus on the type of housing in general (as mentioned in the previous part), as opposed to a more nuanced group.
 
-Apart from habits on controlling cooling devices (such as AC), the use of LED lights.
 ```{r}
 # Create the alluvial plot
 ggplot(allu_data, aes(axis1 = MONEYPY_cat, axis2 = LGTINLED, axis3 = TYPEHUQ)) +
@@ -356,23 +356,26 @@ ggplot(allu_data, aes(axis1 = MONEYPY_cat, axis2 = LGTINLED, axis3 = TYPEHUQ)) +
   scale_x_discrete(limits = c("Income", 'LED', "Type of housing"), expand = c(0.1, 0.1)) +
   scale_fill_brewer(palette = "Set2") +
   labs(
-    title = "Alluvial Plot: Income, LED Use Frequency and cooling",
+    title = "Alluvial Plot: Income, LED and housing type",
     x = "Variables",
-    y = "Frequency"
+    y = "Frequency",
+    fill = "Income"
   ) +
   theme_minimal()
 ```
+From this alluvial plot, we observe that the mid and high income groups tend to have more LED light proportions at home. This underlines a potential inaccessibility among the poorer population to LED lights. LED lights are at least twice the price of normal light bulbs, but save more than 80% of electricity. This suggests for policies to enable wider usage of LED lights at least among the lower income population.
 
 
 ```{r}
 selected_states <- c('LA', 'FL', 'MS', 'CA')
 
+# Filter the data for selected states
 filtered_data <- energy |>
   filter(state_postal %in% selected_states)
 
-aggregated_data <- filtered_data %>%
-  group_by(state_name, LGTINLED) %>%
-  summarise(avg_KWH = mean(KWH, na.rm = TRUE)) %>%
+aggregated_data <- filtered_data |>
+  group_by(state_name, LGTINLED) |>
+  summarise(avg_KWH = mean(KWH, na.rm = TRUE)) |>
   ungroup()
 
 ggplot(aggregated_data, aes(x = factor(LGTINLED), y = avg_KWH, fill = LGTINLED)) +
@@ -381,12 +384,12 @@ ggplot(aggregated_data, aes(x = factor(LGTINLED), y = avg_KWH, fill = LGTINLED))
   scale_fill_gradient(
     low = "grey",   
     high = "darkseagreen",
-    name = "LGTINLED"
+    name = "Level of LED Usage"
   ) +
   labs(
     title = "Comparison of Average KWH by LGTINLED Across States",
-    x = "LGTINLED",
-    y = "Average KWH"
+    x = "LED",
+    y = "Energy Usage (KWH)"
   ) +
   theme_minimal() +
   theme(
@@ -395,35 +398,38 @@ ggplot(aggregated_data, aes(x = factor(LGTINLED), y = avg_KWH, fill = LGTINLED))
     legend.position = "bottom"
   )
 
+# Calculate proportions and percentages
+aggregated_data <- filtered_data |>
+  group_by(state_name, LGTINLED) |>
+  summarise(count_KWH = n(), .groups = "drop") |>
+  group_by(state_name) |>
+  mutate(
+    proportion = count_KWH / sum(count_KWH),
+    percentage = round(proportion * 100, 1) 
+  )
 
+# Create a pie chart for each state using facets
+ggplot(aggregated_data, aes(x = "", y = proportion, fill = factor(LGTINLED))) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar(theta = "y") +
+  facet_wrap(~state_name) +
+  geom_text(aes(label = paste0(percentage, "%")), 
+            position = position_stack(vjust = 0.5), size = 3) +
+  scale_fill_brewer(palette = "Greens", name = "Level of LED Usage") +
+  labs(
+    title = "Proportion of LED Usage Levels Across States",
+    x = NULL,
+    y = NULL
+  ) +
+  theme_void() +
+  theme(
+    strip.text = element_text(size = 12, face = "bold"),
+    legend.position = "bottom"
+  )
 ```
 
-## Annex A
+In the final plots, we want to compare a positive case study (California) and usage patterns with the selected states that have very high household electrical usage. This plot highlights regional differences in energy consumption and the potential role of lighting technologies. California’s low consumption and flat trend reinforce its position as a leader in energy efficiency. 
 
-COOLCNTL
-1: (Set and leave it) Set one temperature and leave it there most of the time
-2: (Manual) Manually adjust the temperature 
-3: (Autoset) Programmable or smart thermostat automatically adjusts the temperature 
-4: (Manual) Turn equipment on or off as needed
-5: (No control) Our household does not have control over the temperature
-
-MONEYPY (Income band)
-Based on the average household income in the selected states, we simplify the categories to the below:
-Below 35,000 set to low (categories 1-9)
-From 35,000-100,000 set to mid (categories 10-14)
-Higher than 100,000 set to upper (categories 14-16)
+Looking deeper into this, California is recognized as a leader in energy efficiency, largely due to its stringent energy efficiency standards, including Title 24 of the California Code of Regulations, which governs building energy use. The primary goal of Title 24 is to reduce wasteful and unnecessary energy consumption in residential and nonresidential buildings. It mandates energy-efficient design in areas such as insulation, windows, lighting, HVAC systems, and building envelopes. For instance, newer updates have included requirements for the adoption of advanced LED lighting, solar panel integration for new homes, and high-efficiency cooling systems to reduce electricity demand during peak periods. The effect can be observed in the plot above, highlighting that California's policies can be used as a positive case study for the southern states to increase energy efficiency and reduce household electrical usage.
 
 
-KWH (Energy usage) 
-Set <25% to 0-9300 kwh, 
-Set 25-50% to 9300-13400, 
-Set 50-75% to 13400-18400, 
-Set >75% to above 18400
-
-COOLCNTL (Cooling )
-1: Set one temperature and leave it there most of the time (Set and leave)
-2: Manually adjust the temperature (Manual)
-3: Programmable or smart thermostat automatically adjusts the temperature (Autoset)
-4: Turn equipment on or off as needed (Manual)
-5: No control (no control)
-Category 2 and 4 incurs lower energy usage and are recommended
