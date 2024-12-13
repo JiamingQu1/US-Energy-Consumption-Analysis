@@ -5,6 +5,8 @@ In conclusion we noticed that the States in the south generally experience highe
 Moving forward, we could further this research through modeling and add temporal dimension to understand the implications of implemented policies and understand the effectiveness of relevant policies at reducing household electrical usage.
 
 Thank you and may we work towards a greener world!
-![earth](earth.jpg)
+
+
+![do your part for the world by saving electricity :)](earth.jpg)
 
 
